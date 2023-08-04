@@ -1,4 +1,4 @@
-rootProject.name = "MyApplication"
+rootProject.name = "LateNightCommits"
 
 include(":androidApp")
 include(":shared")

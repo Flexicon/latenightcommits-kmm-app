@@ -1,4 +1,4 @@
-package com.myapplication
+package dev.flexicon
 
 import MainView
 import android.os.Bundle
