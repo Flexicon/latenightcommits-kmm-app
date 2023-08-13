@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import dev.flexicon.latenightcommits.screen.CommitLogScreen
+import dev.flexicon.latenightcommits.vm.CommitLogViewModel
+import dev.icerock.moko.mvvm.compose.getViewModel
+import dev.icerock.moko.mvvm.compose.viewModelFactory
 
 @Composable
 fun App() {
@@ -16,7 +19,12 @@ fun App() {
         )
     ) {
         val screenModifier = Modifier.background(MaterialTheme.colors.background)
-        CommitLogScreen(screenModifier)
+        val commitLogViewModel = getViewModel(Unit, viewModelFactory { CommitLogViewModel() })
+
+        CommitLogScreen(
+            viewModel = commitLogViewModel,
+            modifier = screenModifier,
+        )
     }
 }
 
