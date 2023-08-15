@@ -11,8 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -26,7 +28,8 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
-    val imageModifier = Modifier.clip(RoundedCornerShape(24.dp))
+    val avatarModifier = Modifier.clip(RoundedCornerShape(24.dp))
+    val fallbackAvatar: @Composable () -> Unit = { RedactedUserAvatar(avatarModifier) }
 
     Card(
         modifier = modifier.padding(bottom = 14.dp),
@@ -39,26 +42,32 @@ fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
                 style = TextStyle(fontFamily = FontFamily.Monospace),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             )
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.width(24.dp)) {
                     if (commit.avatarUrl.isNotBlank()) {
                         KamelImage(
                             asyncPainterResource(commit.avatarUrl),
                             "${commit.author}'s avatar",
-                            onLoading = { RedactedUserAvatar() },
-                            onFailure = { RedactedUserAvatar() },
-                            modifier = imageModifier
+                            onLoading = { fallbackAvatar() },
+                            onFailure = { fallbackAvatar() },
+                            modifier = avatarModifier
                         )
                     } else {
-                        RedactedUserAvatar(modifier = imageModifier)
+                        fallbackAvatar()
                     }
                 }
-                Text(
-                    text = "${commit.author.ifBlank { "anonymous" }} " +
-                            "- ${formatRelativeTime(commit.createdAt)}",
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 5.dp),
-                )
+                Row(modifier = Modifier.padding(horizontal = 5.dp)) {
+                    Text(
+                        text = commit.author.ifBlank { "anonymous" },
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(end = 3.dp),
+                    )
+                    Text(
+                        text = formatRelativeTime(commit.createdAt),
+                        fontSize = 13.sp,
+                        color = Color(0xFFA0AEC0),
+                    )
+                }
             }
         }
     }
@@ -69,7 +78,7 @@ fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
 fun RedactedUserAvatar(modifier: Modifier = Modifier) {
     Image(
         painterResource("redacted_user.xml"),
-        contentDescription = "anonymous",
+        contentDescription = "Anonymous or redacted user avatar",
         modifier = modifier,
     )
 }
