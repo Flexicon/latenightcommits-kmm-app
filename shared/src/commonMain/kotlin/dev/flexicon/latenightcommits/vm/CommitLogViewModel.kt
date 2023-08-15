@@ -23,7 +23,10 @@ data class CommitLogUiState(
     val hasNextPage: Boolean = true,
     val isLoading: Boolean = true,
     val error: String? = null,
-)
+) {
+    val hasError: Boolean
+        get() = !error.isNullOrBlank()
+}
 
 class CommitLogViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CommitLogUiState())

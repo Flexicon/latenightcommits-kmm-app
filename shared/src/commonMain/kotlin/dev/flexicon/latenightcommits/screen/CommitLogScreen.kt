@@ -3,11 +3,7 @@ package dev.flexicon.latenightcommits.screen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -19,13 +15,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.flexicon.latenightcommits.model.Commit
-import dev.flexicon.latenightcommits.util.formatRelativeTime
+import dev.flexicon.latenightcommits.view.CommitLog
 import dev.flexicon.latenightcommits.vm.CommitLogViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -54,11 +48,17 @@ fun CommitLogScreen(
         Text(
             text = "When the pressures of being 10x just overwhelm you",
             fontSize = 13.sp,
-            modifier = Modifier.padding(4.dp).padding(bottom = 20.dp),
+            fontStyle = FontStyle.Italic,
+            modifier = Modifier.padding(4.dp).padding(bottom = 32.dp),
             color = MaterialTheme.colors.onBackground,
         )
 
-        if (uiState.error.isNullOrBlank()) {
+        if (uiState.hasError) {
+            Text(
+                text = "Failed to fetch commit log: ${uiState.error}",
+                color = MaterialTheme.colors.onBackground,
+            )
+        } else {
             Box(
                 modifier = Modifier.fillMaxSize()
                     .pullRefresh(pullRefreshState),
@@ -70,36 +70,6 @@ fun CommitLogScreen(
                     modifier = Modifier.align(Alignment.TopCenter),
                 )
             }
-        } else {
-            Text(text = "Failed to fetch commit log: ${uiState.error}", color = Color.White)
-        }
-    }
-}
-
-@Composable
-fun CommitLog(commits: List<Commit>, modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier) {
-        items(commits) {
-            CommitLogItem(it)
-        }
-    }
-}
-
-@Composable
-fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.padding(bottom = 12.dp)) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(
-                text = commit.message,
-                fontSize = 16.sp,
-                style = TextStyle(fontFamily = FontFamily.Monospace),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-            )
-            Text(
-                text = "${commit.author} - ${formatRelativeTime(commit.createdAt)}",
-                fontSize = 13.sp,
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
     }
 }

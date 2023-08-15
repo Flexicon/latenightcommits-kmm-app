@@ -2,7 +2,7 @@
 
 Current TODOs:
 - [x] pull to refresh
-- [ ] style commit card to match web design
+- [x] style commit card to match web design
 - [ ] infinite scroll
 - [ ] click card to go-to commit
 
