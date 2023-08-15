@@ -17,15 +17,15 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.flexicon.latenightcommits.model.Commit
+import dev.flexicon.latenightcommits.util.formatRelativeTime
 import dev.flexicon.latenightcommits.vm.CommitLogViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -88,19 +88,17 @@ fun CommitLog(commits: List<Commit>, modifier: Modifier = Modifier) {
 @Composable
 fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
     Card(modifier = modifier.padding(bottom = 12.dp)) {
-        Column {
+        Column(modifier = Modifier.padding(8.dp)) {
             Text(
                 text = commit.message,
-                modifier = Modifier.fillMaxWidth()
-                    .padding(5.dp, 8.dp),
+                fontSize = 16.sp,
+                style = TextStyle(fontFamily = FontFamily.Monospace),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
             )
             Text(
-                text = "- " + commit.author,
+                text = "${commit.author} - ${formatRelativeTime(commit.createdAt)}",
                 fontSize = 13.sp,
-                textAlign = TextAlign.End,
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 5.dp)
-                    .padding(bottom = 5.dp),
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

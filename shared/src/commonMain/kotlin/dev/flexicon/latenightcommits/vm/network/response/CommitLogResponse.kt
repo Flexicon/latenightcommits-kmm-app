@@ -1,6 +1,7 @@
 package dev.flexicon.latenightcommits.vm.network.response
 
 import dev.flexicon.latenightcommits.model.Commit
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -23,15 +24,13 @@ data class CommitLogResponseItem(
     val message: String,
 )
 
-fun List<CommitLogResponseItem>.toModel(): List<Commit> =
-    map { it.toModel() }
+fun List<CommitLogResponseItem>.toModel(): List<Commit> = map { it.toModel() }
 
-fun CommitLogResponseItem.toModel(): Commit =
-    Commit(
-        author = author,
-        avatarUrl = avatarUrl,
-        createdAt = createdAt,
-        id = id,
-        link = link,
-        message = message,
-    )
+fun CommitLogResponseItem.toModel(): Commit = Commit(
+    author = author,
+    avatarUrl = avatarUrl,
+    createdAt = Instant.parse(createdAt),
+    id = id,
+    link = link,
+    message = message,
+)
