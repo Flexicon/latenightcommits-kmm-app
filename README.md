@@ -1,6 +1,12 @@
-[![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-# [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) mobile application
+# WIP Late Night Commits multiplatform mobile app
+
+Current TODOs:
+- [x] pull to refresh
+- [ ] style commit card to match web design
+- [ ] infinite scroll
+- [ ] click card to go-to commit
+
+## [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) mobile application
 
 > **Note**
 > Compose Multiplatform for iOS is in Alpha. It may change incompatibly and require manual migration in the future.
