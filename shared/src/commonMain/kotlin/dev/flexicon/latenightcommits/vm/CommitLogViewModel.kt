@@ -2,7 +2,7 @@ package dev.flexicon.latenightcommits.vm
 
 import dev.flexicon.latenightcommits.model.Commit
 import dev.flexicon.latenightcommits.vm.network.response.CommitLogResponse
-import dev.flexicon.latenightcommits.vm.network.response.CommitLogResponseItem
+import dev.flexicon.latenightcommits.vm.network.response.toModel
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -21,12 +21,16 @@ data class CommitLogUiState(
     val commits: List<Commit> = emptyList(),
     val currentPage: Int = 0,
     val hasNextPage: Boolean = true,
+    val isLoading: Boolean = true,
     val error: String? = null,
 )
 
 class CommitLogViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CommitLogUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val currentPage: Int
+        get() = _uiState.value.currentPage
 
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -35,7 +39,7 @@ class CommitLogViewModel : ViewModel() {
     }
 
     init {
-        loadCommitLog()
+        loadNextPage()
     }
 
     override fun onCleared() {
@@ -43,37 +47,23 @@ class CommitLogViewModel : ViewModel() {
         httpClient.close()
     }
 
-    fun loadCommitLog() {
-        viewModelScope.launch {
-            getCommitLog().fold(
-                { commitLog ->
-                    _uiState.update {
-                        it.copy(
-                            commits = it.commits + commitLog.log.toModel(),
-                            currentPage = it.currentPage + 1,
-                            hasNextPage = commitLog.hasNextPage,
-                            error = null,
-                        )
-                    }
-                },
-                { error ->
-                    _uiState.update {
-                        it.copy(
-                            commits = emptyList(),
-                            currentPage = 0,
-                            hasNextPage = false,
-                            error = error.message,
-                        )
-                    }
-                },
-            )
-        }
+    fun loadNextPage() = viewModelScope.launch {
+        startLoading()
+        getCommitLogPage(currentPage + 1)
+            .fold(::handleLoadNextPageSuccess, ::handleLoadError)
     }
 
-    private suspend fun getCommitLog(): Result<CommitLogResponse> = runCatching {
+    fun refresh() = viewModelScope.launch {
+        startLoading()
+        getCommitLogPage(1)
+            .fold(::handleRefreshSuccess, ::handleLoadError)
+    }
+
+
+    private suspend fun getCommitLogPage(page: Int): Result<CommitLogResponse> = runCatching {
         httpClient.get("${BASE_API_URL}/commitlog") {
             parameters {
-                append("page", (_uiState.value.currentPage + 1).toString())
+                append("page", page.toString())
                 append("per_page", "50")
             }
         }.also {
@@ -81,18 +71,40 @@ class CommitLogViewModel : ViewModel() {
         }.body()
     }
 
-    private fun List<CommitLogResponseItem>.toModel(): List<Commit> =
-        map { it.toModel() }
+    private fun startLoading() = _uiState.update {
+        it.copy(isLoading = true)
+    }
 
-    private fun CommitLogResponseItem.toModel(): Commit =
-        Commit(
-            author = author,
-            avatarUrl = avatarUrl,
-            createdAt = createdAt,
-            id = id,
-            link = link,
-            message = message,
+    private fun handleLoadNextPageSuccess(commitLog: CommitLogResponse) = _uiState.update {
+        it.copy(
+            commits = it.commits + commitLog.log.toModel(),
+            currentPage = it.currentPage + 1,
+            hasNextPage = commitLog.hasNextPage,
+            isLoading = false,
+            error = null,
         )
+    }
+
+    private fun handleRefreshSuccess(commitLog: CommitLogResponse) = _uiState.update {
+        it.copy(
+            commits = commitLog.log.toModel(),
+            currentPage = 1,
+            hasNextPage = commitLog.hasNextPage,
+            isLoading = false,
+            error = null,
+        )
+    }
+
+
+    private fun handleLoadError(error: Throwable) = _uiState.update {
+        it.copy(
+            commits = emptyList(),
+            currentPage = 0,
+            hasNextPage = false,
+            isLoading = false,
+            error = error.message,
+        )
+    }
 
     companion object {
         const val BASE_API_URL = "https://latenightcommits.com/api"
