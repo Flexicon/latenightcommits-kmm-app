@@ -1,4 +1,5 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,3 +30,10 @@ fun App() {
 }
 
 expect fun getPlatformName(): String
+
+@Composable
+expect fun BrowserLink(
+    url: String,
+    modifier: Modifier = Modifier,
+    content: @Composable (BoxScope.() -> Unit),
+)

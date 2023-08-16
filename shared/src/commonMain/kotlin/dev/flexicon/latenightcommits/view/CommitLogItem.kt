@@ -1,5 +1,6 @@
 package dev.flexicon.latenightcommits.view
 
+import BrowserLink
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,12 +37,14 @@ fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(10.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = commit.message,
-                fontSize = 16.sp,
-                style = TextStyle(fontFamily = FontFamily.Monospace),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-            )
+            BrowserLink(commit.link) {
+                Text(
+                    text = commit.message,
+                    fontSize = 16.sp,
+                    style = TextStyle(fontFamily = FontFamily.Monospace),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                )
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.width(24.dp)) {
                     if (commit.avatarUrl.isNotBlank()) {

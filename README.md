@@ -4,7 +4,8 @@ Current TODOs:
 - [x] pull to refresh
 - [x] style commit card to match web design
 - [ ] infinite scroll
-- [ ] click card to go-to commit
+- [x] click card text to go-to commit
+- [ ] click commit author to go-to their profile
 
 ## [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) mobile application
 
