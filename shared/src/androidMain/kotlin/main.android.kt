@@ -15,12 +15,13 @@ fun MainView() = App()
 @Composable
 actual fun BrowserLink(
     url: String,
+    enabled: Boolean,
     modifier: Modifier,
     content: @Composable (BoxScope.() -> Unit),
 ) {
     val context = LocalContext.current
     Box(
-        modifier = modifier.clickable {
+        modifier = modifier.clickable(enabled = enabled) {
             runCatching { Uri.parse(url) }.fold(
                 { context.startActivity(Intent(Intent.ACTION_VIEW, it)) },
                 { println("Invalid URL passed as BrowserLink: $url") },

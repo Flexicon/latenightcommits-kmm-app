@@ -34,6 +34,7 @@ expect fun getPlatformName(): String
 @Composable
 expect fun BrowserLink(
     url: String,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
     content: @Composable (BoxScope.() -> Unit),
 )

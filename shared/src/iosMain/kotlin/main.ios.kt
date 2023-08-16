@@ -14,11 +14,12 @@ fun MainViewController() = ComposeUIViewController { App() }
 @Composable
 actual fun BrowserLink(
     url: String,
+    enabled: Boolean,
     modifier: Modifier,
     content: @Composable (BoxScope.() -> Unit),
 ) {
     Box(
-        modifier = modifier.clickable {
+        modifier = modifier.clickable(enabled = enabled) {
             NSURL.URLWithString(url)?.let {
                 UIApplication.sharedApplication.openURL(it)
             } ?: println("Invalid URL passed as BrowserLink: $url")

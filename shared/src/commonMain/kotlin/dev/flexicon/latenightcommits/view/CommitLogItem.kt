@@ -37,12 +37,16 @@ fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(10.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            BrowserLink(commit.link) {
+            BrowserLink(
+                commit.link,
+                enabled = commit.link.isNotBlank(),
+                modifier = Modifier.padding(bottom = 16.dp),
+            ) {
                 Text(
                     text = commit.message,
                     fontSize = 16.sp,
                     style = TextStyle(fontFamily = FontFamily.Monospace),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -60,11 +64,16 @@ fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
                     }
                 }
                 Row(modifier = Modifier.padding(horizontal = 5.dp)) {
-                    Text(
-                        text = commit.author.ifBlank { "anonymous" },
-                        fontSize = 13.sp,
-                        modifier = Modifier.padding(end = 3.dp),
-                    )
+                    BrowserLink(
+                        "https://github.com/${commit.author}",
+                        enabled = commit.author.isNotBlank(),
+                    ) {
+                        Text(
+                            text = commit.author.ifBlank { "anonymous" },
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(end = 3.dp),
+                        )
+                    }
                     Text(
                         text = formatRelativeTime(commit.createdAt),
                         fontSize = 13.sp,
