@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.flexicon.latenightcommits.model.Commit
@@ -29,9 +30,6 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
-    val avatarModifier = Modifier.clip(RoundedCornerShape(24.dp))
-    val fallbackAvatar: @Composable () -> Unit = { RedactedUserAvatar(avatarModifier) }
-
     Card(
         modifier = modifier.padding(bottom = 14.dp),
         shape = RoundedCornerShape(10.dp),
@@ -50,38 +48,53 @@ fun CommitLogItem(commit: Commit, modifier: Modifier = Modifier) {
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.width(24.dp)) {
-                    if (commit.avatarUrl.isNotBlank()) {
-                        KamelImage(
-                            asyncPainterResource(commit.avatarUrl),
-                            "${commit.author}'s avatar",
-                            onLoading = { fallbackAvatar() },
-                            onFailure = { fallbackAvatar() },
-                            modifier = avatarModifier
-                        )
-                    } else {
-                        fallbackAvatar()
-                    }
-                }
-                Row(modifier = Modifier.padding(horizontal = 5.dp)) {
-                    BrowserLink(
-                        "https://github.com/${commit.author}",
-                        enabled = commit.author.isNotBlank(),
-                    ) {
-                        Text(
-                            text = commit.author.ifBlank { "anonymous" },
-                            fontSize = 13.sp,
-                            modifier = Modifier.padding(end = 3.dp),
-                        )
-                    }
-                    Text(
-                        text = formatRelativeTime(commit.createdAt),
-                        fontSize = 13.sp,
-                        color = Color(0xFFA0AEC0),
-                    )
-                }
+                CommitAuthorAvatar(commit)
+                CommitAuthorAndTimestamp(commit)
             }
         }
+    }
+}
+
+@Composable
+fun CommitAuthorAvatar(commit: Commit, width: Dp = 24.dp, modifier: Modifier = Modifier) {
+    val avatarModifier = Modifier.clip(RoundedCornerShape(width))
+    val avatarFallback: @Composable () -> Unit = { RedactedUserAvatar(avatarModifier) }
+
+    Box(modifier = modifier.width(width)) {
+        commit.avatarUrl.takeIf { it.isNotBlank() }
+            ?.let {
+                KamelImage(
+                    asyncPainterResource(it),
+                    "${commit.author}'s avatar",
+                    onLoading = { avatarFallback() },
+                    onFailure = { avatarFallback() },
+                    modifier = avatarModifier
+                )
+            } ?: avatarFallback()
+    }
+}
+
+@Composable
+fun CommitAuthorAndTimestamp(
+    commit: Commit,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier.padding(horizontal = 5.dp)) {
+        BrowserLink(
+            "https://github.com/${commit.author}",
+            enabled = commit.author.isNotBlank(),
+        ) {
+            Text(
+                text = commit.author.ifBlank { "anonymous" },
+                fontSize = 13.sp,
+                modifier = Modifier.padding(end = 3.dp),
+            )
+        }
+        Text(
+            text = formatRelativeTime(commit.createdAt),
+            fontSize = 13.sp,
+            color = Color(0xFFA0AEC0),
+        )
     }
 }
 
